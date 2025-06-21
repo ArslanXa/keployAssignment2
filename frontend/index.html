@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Users App</title>
+</head>
+<body>
+  <h1>User Form</h1>
+  <form id="userForm">
+    <input type="text" placeholder="Name" id="name" required />
+    <input type="email" placeholder="Email" id="email" required />
+    <input type="number" placeholder="Age" id="age" required />
+    <button type="submit">Add User</button>
+  </form>
+
+  <h2>All Users</h2>
+  <ul id="userList"></ul>
+
+  <script>
+    async function fetchUsers() {
+      const res = await fetch('/api/users');
+      const users = await res.json();
+      const list = document.getElementById('userList');
+      list.innerHTML = '';
+      users.forEach(u => {
+        const item = document.createElement('li');
+        item.textContent = `${u.name} (${u.email}) - Age ${u.age}`;
+        list.appendChild(item);
+      });
+    }
+
+    document.getElementById('userForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const age = document.getElementById('age').value;
+      await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, age: parseInt(age) })
+      });
+      e.target.reset();
+      fetchUsers();
+    });
+
+    fetchUsers();
+  </script>
+</body>
+</html>
